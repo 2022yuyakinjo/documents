@@ -2,40 +2,51 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
   pageEncoding="UTF-8"%>
   
-<%
+<%    if(session.getAttribute("totalNum") == null) {  //session,getAttributeの値がnull（ヌル）の時、
+	session.setAttribute("totalNum", 25);
+}
 	String start = request.getParameter("submit");
     // 残数の更新処理(残数の取得、更新、保存など)    
-    int totalNum = 25;
-    int newtotal = 0;
+
     String Num = request.getParameter("num");
     int Num1 = 0;
-    
+    int totalNum = (int) session.getAttribute("totalNum");  //6行目のsession
     if(Utility.isNullOrEmpty(Num)) {
     	Num1 = 0;
     } else {
         Num1 = Integer.parseInt(Num);
-		newtotal = totalNum - Num1;
+// 		totalNum = totalNum - Num1;
+       totalNum -= Num1;  //  左辺ー右辺を左辺に入れる。
     }
-    session.setAttribute("totalNum", newtotal);
-    
-	
-    
-    
-    // プレイヤーの切替処理(プレイヤーの取得、切替、保存など)
-	
-  
     
 
-   
     
+    session.setAttribute("totalNum", totalNum);
+    
+    if(session.getAttribute("player") == null) {  //session,getAttributeの値がnull（ヌル）の時、
+    	session.setAttribute("player", "A");
+    }
+    
+    String player = Utility.getPlayer((String) session.getAttribute("player"));
+    // プレイヤーの切替処理(プレイヤーの取得、切替、保存など)
+    
+	String playerA;
+	String playerB;
+
+
+	session.setAttribute("player", player);
+    session.setAttribute("totalNum", totalNum);
     // 残数が0以下の場合、結果ページへ遷移
     // (responseオブジェクトのsendRedirectメソッドを使用する)
 
     	
   //残数が0以下なら、「〇〇.jsp」へ遷移
-
+	if(totalNum <= 0) {
+		 response.sendRedirect("finish.jsp");
+	}
 
     
+  
     
 %>
 <!DOCTYPE html>
@@ -56,15 +67,14 @@
       <%
           // todo:このprint分は仮の処理。実装が完了したら削除する。
           // 表示する文字列("●●～")をメソッドを使い取得し、取得した文字列を表示する
-          
-          out.println(Utility.getStoneDisplayHtml(totalNum, "●"));
-          
+          String result = Utility.getStoneDisplayHtml(totalNum);
+          out.println(result);
       %>
     </p>
   </div>
   <div class="info">
     <h2>
-      プレイヤーxxの番
+      プレイヤー<%=player %>の番
     </h2>
 
     <form action="play.jsp">
